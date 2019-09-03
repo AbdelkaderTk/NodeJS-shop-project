@@ -1,3 +1,3 @@
 # NodeJS-project
-Shop project
+Shop project /
 Learning NodeJS
