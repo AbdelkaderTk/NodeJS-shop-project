@@ -32,7 +32,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname);
   }
 })
 
@@ -53,6 +53,7 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter}).single('image')
 );
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(session({
   secret: 'SecretKey',
   resave: false,
@@ -98,6 +99,7 @@ app.use('/500', errorController.get500);
 app.use(errorController.get404);
 
 app.use((error,req,res,next) => {
+  console.log(error);
   res.status(500).render('500', {
     pageTitle: 'Technical error',
     path: "/500"
