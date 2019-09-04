@@ -145,13 +145,26 @@ exports.postEditProduct = (req,res,next) => {
 };
 
 exports.getProducts = (req,res,next) => {
-  Product
-    .find({ userId: req.user._id })
+  const page = +req.query.page || 1;
+  const ITEM_PER_PAGE = 3;
+  let totalProductNumber;
+  Product.find()
+    .countDocuments()
+    .then(totalItemsNumber => {
+      totalProductNumber = totalItemsNumber;
+      return Product.find({ userId: req.user._id })
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE)
+    })
     .then(products => {
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin products',
-        path: '/admin/products'
+        path: '/admin/products',
+        currentPage: page,
+        previousPage: page - 1,
+        nextPage: page + 1,
+        lastPage: Math.ceil(totalProductNumber/ITEM_PER_PAGE),
       });
     })
     .catch(err => {
