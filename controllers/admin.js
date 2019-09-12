@@ -175,8 +175,8 @@ exports.getProducts = (req,res,next) => {
     );
 };
 
-exports.postDeleteProduct = (req,res,next) => {
-  const prodID = req.body.productID;
+exports.deleteProduct = (req,res,next) => {
+  const prodID = req.params.productID;
   const userId = req.user._id;
   Product.findById(prodID)
     .then(product => {
@@ -187,17 +187,14 @@ exports.postDeleteProduct = (req,res,next) => {
       return Product.deleteOne({_id: prodID, userId: userId});
     })
     .then(results => {
-      console.log(results);
       if (results.n > 0) {
         req.user.deleteItemFromCart(prodID)
         console.log('PRODUCT DELETED');
       }
-      res.redirect("/admin/products");
+      res.status(200).json('Product deleted')
     })
     .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      res.status(500).json('Product not deleted')
       }
     );
 }
