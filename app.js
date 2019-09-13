@@ -26,6 +26,8 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const errorController = require('./controllers/error');
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -61,12 +63,10 @@ app.use(session({
   store: store
   })
 );
-app.use(csrfProtection);
 app.use(flash());
 
 app.use((req,res,next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
   next();
 })
 
@@ -89,6 +89,14 @@ app.use((req,res,next) => {
     return next(error);
     }
   );
+})
+
+app.post('/create-order', isAuth, shopController.postOrder);
+
+app.use(csrfProtection);
+app.use((req,res,next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
 })
 
 app.use("/admin", adminRoutes);
